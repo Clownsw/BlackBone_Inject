@@ -1,4 +1,4 @@
-﻿
+
 #include <iostream>
 #include <windows.h>
 
@@ -43,6 +43,11 @@ void Init(HMODULE _hModule)
 	InjectDll = (Func_InjectDll)GetProcAddress(_hModule, reinterpret_cast<LPCSTR>(13));
 }
 
+void Inject(void)
+{
+	InjectDll(pid, szValue, IT_Apc, 0, initArg, false, false, true);
+}
+
 int main()
 {
 
@@ -68,7 +73,7 @@ int main()
 
 	std::cout << "Pid: " << pid << std::endl;
 	
-	InjectDll(pid, szValue, IT_Thread, 0, initArg, false, false, true);
+	Inject();
 	
 	if (DriverHandle != NULL)
 	{
