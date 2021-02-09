@@ -1,4 +1,3 @@
-
 #include <iostream>
 #include <windows.h>
 
@@ -33,6 +32,7 @@ const std::wstring initArg = L"";
 
 TCHAR ProcessWindowName[MAX_PATH + 1];
 TCHAR szValue[MAX_PATH + 1];
+int mode = 1;
 
 Func_Initialize Initialize;
 Func_InjectDll InjectDll;
@@ -45,7 +45,32 @@ void Init(HMODULE _hModule)
 
 void Inject(void)
 {
-	InjectDll(pid, szValue, IT_Apc, 0, initArg, false, false, true);
+	switch (mode)
+	{
+	case 0:
+	{
+		InjectDll(pid, szValue, IT_Thread, 0, initArg, false, false, true);
+		break;
+	}
+
+	case 1:
+	{
+		InjectDll(pid, szValue, IT_Apc, 0, initArg, false, false, true);
+		break;
+	}
+	
+	case 2:
+	{
+		InjectDll(pid, szValue, IT_MMap, 0, initArg, false, false, true);
+		break;
+	}
+
+	default:
+		InjectDll(pid, szValue, IT_Thread, 0, initArg, false, false, true);
+		break;
+	}
+
+	
 }
 
 int main()
@@ -62,6 +87,8 @@ int main()
 
 	std::cout << InjectDll << std::endl;
 
+	mode = GetPrivateProfileIntA("z.smliexx.ml", "mode", 1, "./Inject.ini");
+
 	GetPrivateProfileString(L"z.smliexx.ml", L"ProcessWindowName", L"-1", ProcessWindowName, MAX_PATH, L"./Inject.ini");
 	GetPrivateProfileString(L"z.smliexx.ml", L"DllPath", L"-1", szValue, MAX_PATH, L"./Inject.ini");
 
@@ -73,6 +100,8 @@ int main()
 
 	std::cout << "Pid: " << pid << std::endl;
 	
+	std::cout << "Mode: " << mode << std::endl;
+
 	Inject();
 	
 	if (DriverHandle != NULL)
@@ -80,7 +109,7 @@ int main()
 		CloseHandle(DriverHandle);
 	}
 
-	Sleep(300);
+	Sleep(1000);
 	exit(0);
 
 	return 0;
